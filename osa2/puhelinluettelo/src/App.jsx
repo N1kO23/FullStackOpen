@@ -1,6 +1,18 @@
 import { useState, useEffect } from 'react'
 import personService from '../services/persons'
 
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className="error">
+      {message}
+    </div>
+  )
+}
+
 const Filter = ({ searchQuery, handleSearchQueryChange }) => {
   return (
     <div>
@@ -44,6 +56,7 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [errorMessage, setErrorMessage] = useState('')
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
@@ -61,12 +74,18 @@ const App = () => {
     if (window.confirm("Do you really want to delete this person?")) {
       personService.deletePerson(id).then(response => {
         if (response.status === 200) {
-          personService.getAllPersons().then(response => {
-            setPersons(response.data);
-          })
+          setErrorMessage(`Delete successful`)
+          setTimeout(() => { setErrorMessage(null) }, 5000)
         } else {
-          console.log(response)
+          setErrorMessage(`Error happened while deleting`)
+          setTimeout(() => { setErrorMessage(null) }, 5000)
         }
+      }).catch((err) => {
+        setErrorMessage(`Error happened while deleting: ${err.message}`)
+        setTimeout(() => { setErrorMessage(null) }, 5000)
+      })
+      personService.getAllPersons().then(response => {
+        setPersons(response.data);
       })
     }
   }
@@ -85,13 +104,29 @@ const App = () => {
     if (foundPerson) {
       if (window.confirm(`The person ${newName} is already in phonebook. Do you want to update their phone number?`)) {
         const personToAdd = { name: newName, number: newNumber };
-        await personService.updatePerson(foundPerson.id, personToAdd);
-        setNewName('');
-        setNewNumber('');
+        const response = await personService.updatePerson(foundPerson.id, personToAdd);
+        if (response.status === 200) {
+          setNewName('');
+          setNewNumber('');
+          setErrorMessage(`${personToAdd.name} updated successfully`)
+          setTimeout(() => { setErrorMessage(null) }, 5000)
+        } else {
+          setErrorMessage(`Something went wrong during update`)
+          setTimeout(() => { setErrorMessage(null) }, 5000)
+        }
       }
     } else {
       const personToAdd = { name: newName, number: newNumber };
-      await personService.createPerson(personToAdd);
+      const response = await personService.createPerson(personToAdd);
+      if (response.status === 201) {
+        setNewName('');
+        setNewNumber('');
+        setErrorMessage(`${personToAdd.name} added successfully`)
+        setTimeout(() => { setErrorMessage(null) }, 5000)
+      } else {
+        setErrorMessage(`Something went wrong when adding new person`)
+        setTimeout(() => { setErrorMessage(null) }, 5000)
+      }
       setNewName('');
       setNewNumber('');
     }
@@ -107,6 +142,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={errorMessage} />
       <Filter searchQuery={searchQuery} handleSearchQueryChange={handleSearchQueryChange} />
       <h2>Add a new</h2>
       <PersonForm addNumber={addNumber} newName={newName} newNumber={newNumber} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} />
