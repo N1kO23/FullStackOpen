@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import personService from '../services/persons'
 
 const Notification = ({ message }) => {
-  if (message === null) {
-    return null
+  if (message === null || message === undefined || message === "") {
+    return null;
   }
 
   return (
