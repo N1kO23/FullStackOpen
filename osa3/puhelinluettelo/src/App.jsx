@@ -79,7 +79,7 @@ const App = () => {
       personService
         .deletePerson(id)
         .then((response) => {
-          if (response.status === 200) {
+          if (response.status === 204) {
             setErrorMessage(`Delete successful`);
             setTimeout(() => {
               setErrorMessage(null);
