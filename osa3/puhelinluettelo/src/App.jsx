@@ -123,40 +123,45 @@ const App = () => {
         )
       ) {
         const personToAdd = { name: newName, number: newNumber };
-        const response = await personService.updatePerson(
-          foundPerson.id,
-          personToAdd
-        );
-        if (response.status === 200) {
-          setNewName("");
-          setNewNumber("");
-          setErrorMessage(`${personToAdd.name} updated successfully`);
-          setTimeout(() => {
-            setErrorMessage(null);
-          }, 5000);
-        } else {
-          setErrorMessage(`Something went wrong during update`);
-          setTimeout(() => {
-            setErrorMessage(null);
-          }, 5000);
-        }
+        personService
+          .updatePerson(foundPerson.id, personToAdd)
+          .then((response) => {
+            if (response.status === 200) {
+              setNewName("");
+              setNewNumber("");
+              setErrorMessage(`${personToAdd.name} updated successfully`);
+              setTimeout(() => {
+                setErrorMessage(null);
+              }, 5000);
+            }
+          })
+          .catch((error) => {
+            setErrorMessage(error.response.data);
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, 5000);
+          });
       }
     } else {
       const personToAdd = { name: newName, number: newNumber };
-      const response = await personService.createPerson(personToAdd);
-      if (response.status === 201) {
-        setNewName("");
-        setNewNumber("");
-        setErrorMessage(`${personToAdd.name} added successfully`);
-        setTimeout(() => {
-          setErrorMessage(null);
-        }, 5000);
-      } else {
-        setErrorMessage(`Something went wrong when adding new person`);
-        setTimeout(() => {
-          setErrorMessage(null);
-        }, 5000);
-      }
+      personService
+        .createPerson(personToAdd)
+        .then((response) => {
+          if (response.status === 201) {
+            setNewName("");
+            setNewNumber("");
+            setErrorMessage(`${personToAdd.name} added successfully`);
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, 5000);
+          }
+        })
+        .catch((error) => {
+          setErrorMessage(error.response.data);
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
+        });
       setNewName("");
       setNewNumber("");
     }
