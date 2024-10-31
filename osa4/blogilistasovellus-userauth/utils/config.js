@@ -4,7 +4,8 @@ const DB_USERNAME = process.env.DB_USERNAME;
 const DB_PASSWORD = process.env.DB_PASSWORD;
 const DB_HOST = process.env.DB_HOST;
 const DB_PROTO = process.env.DB_PROTO || "mongodb+srv"; // Defaulting to atlas based proto
-const MONGODB_DB = process.env.NODE_ENV === "test" ? "blogstest" : "blogs";
+const MONGODB_DB =
+  process.env.NODE_ENV === "test" ? "authblogstest" : "authblogs";
 
 if (!DB_USERNAME) {
   console.error("database username not defined");
